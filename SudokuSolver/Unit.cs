@@ -10,7 +10,7 @@ namespace SudokuSolver
     class Unit
     {
         Square[] myMembers;
-        bool isComplete;
+        bool isComplete, updateUnhandled;
         bool[][] valueTable;
         int n4, n2, n;
         public Unit(Square[] members)
@@ -21,6 +21,7 @@ namespace SudokuSolver
             n4 = n2 * n2;
             isComplete = checkCompletion();
             valueTable = new bool[n2][];
+            updateUnhandled = false;
         }
         private void updateValueTable()
         {
@@ -43,58 +44,67 @@ namespace SudokuSolver
             isComplete = tempCompletion;//using a temp so threading wont mess this up
             return isComplete;
         }
-        public Square[] elimination()
+        public Square[] operate()
         {
-            setImpossibles();//need a way to post changes
-            updateValueTable();
-            bool updateMade = false;
-            int counter = 0, position, value;
-            int lastIndex;
-            for (value = 0; value < n2; value++)
-            {//check for only one of a number in the array
-                lastIndex = 0;
-                for (position = 0; position < n2; position++)
+            setImpossibles();
+            elimination();
+            
+            return myMembers;
+        }
+        public void elimination()
+        {//there is only one value in the unit that can satisfy a value
+            int counter = 0, onlyIndex = -1 ;
+            bool[][] possibleValueTable = getPossibleValueTable();
+            for (int value = 0; value < n2; value++)
+            {
+                counter = 0;
+                for (int position = 0; position < n2 && counter < 2; position++)
                 {
-                    if (valueTable[position][value] && myMembers[position].getValue() != value)
+                    if (possibleValueTable[position][value])
                     {
-                        counter++;//this value now has one more possible position on the unit
-                        lastIndex = position;
+                        counter++;
+                        onlyIndex = position;
                     }
                 }
                 if (counter == 1)
                 {
-                    for (int i = 0; i < n2; i++)
-                    {//all the other members cannot have this value anymore. Make it impossible to have it.
-                        myMembers[i].impossibleValue(value);
-                    }
-                    myMembers[lastIndex].setValue(value);
-                    //clearly the position  that we determined has this value
-                    updateMade = true;//set updatemade to true. Some other squares may have a value now.
-                    value = n2 + 1;//this will cause the loop to exit and will repeat the function
+                    myMembers[onlyIndex].setValue(value);
+                    possibleValueTable = getPossibleValueTable();// updates have been made. Reflect this.
+                    //value = 0;
                 }
             }
-            if (updateMade)
+        }
+        public bool[][] getPossibleValueTable()
+        {
+            int counter = 0;
+            bool[][] tempPossibleValues = new bool[n2][];
+            foreach (Square s in myMembers)
             {
-                myMembers = elimination();
+                tempPossibleValues[counter] = s.getPossibleValues();
+                counter++;
             }
-            return myMembers;
+            return tempPossibleValues;
         }
         public void setImpossibles()
-        {
-            int value = Square.NULL_VALUE;
-            for (int primary = 0; primary < n2; primary++)
+        {//take out the values from the unit from the possible values of the others in the unit
+            int value;
+            List<int> impossibles = new List<int>();
+            for (int aSquareWithValue = 0; aSquareWithValue < n2; aSquareWithValue++)
             {
-                value = myMembers[primary].getValue();
-                if (value != Square.NULL_VALUE)
+                value = myMembers[aSquareWithValue].getValue();
+                if (value == Square.NULL_VALUE)
                 {
-                    for (int secondary = 0; secondary < n2; secondary++)
-                    {
-                        if (secondary != primary)
-                        {
-                            myMembers[secondary].impossibleValue(value);
-                        }
-                    }
+                    continue;
                 }
+                impossibles.Add(value);
+            }
+            for (int squareWithOutAValue = 0; squareWithOutAValue < n2; squareWithOutAValue++)
+            {
+                if (myMembers[squareWithOutAValue].getValue() == Square.NULL_VALUE)//the square has no value
+                {
+                    myMembers[squareWithOutAValue].impossibleValues(impossibles);
+                }
+                    //updateUnhandled = true
             }
         }
 

@@ -70,14 +70,14 @@ namespace SudokuSolver
             }
             for (int i = 0; i < n2; i++)
             {
-                groupedSquares[i] = unitsOfAType[i].elimination();
+                groupedSquares[i] = unitsOfAType[i].operate();
             }
             //wait for all eliminations to complete
 
             //stitch the all squares back together and return that
             allSquares = stitchJaggedArray(groupedSquares);
             //check completion status
-            checkCompletion();
+            checkCompletion();//I need to make sure this is properly ordered
             return allSquares;
         }
         private Square[] stitchJaggedArray(Square[][] sJaggedArray)
@@ -87,6 +87,7 @@ namespace SudokuSolver
             {
                 sList.AddRange(sArr);
             }
+            sList.Sort();
             return sList.ToArray();
         }
 

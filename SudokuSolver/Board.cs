@@ -8,7 +8,7 @@ namespace SudokuSolver
 {
     class Board
     {
-        public int[] typesAvailable = { UnitType.ROW, UnitType.BLOCK, UnitType.COLUMN };
+        public int[] typesAvailable = { UnitType.ROW, UnitType.COLUMN, UnitType.BLOCK };
         Square[] allSquares;
         private int n, n2 ,n4;
         private int numberOfIterations = 0;
@@ -55,6 +55,7 @@ namespace SudokuSolver
         }
         public bool isComplete()
         {
+            complete = completionStatus();
             return complete;
         }
         private void fillSquares()
@@ -81,9 +82,29 @@ namespace SudokuSolver
             }
             return allSquaresText;
         }
-        public Square[] showSquares()
+        public Square[] getSquares()
         {
             return allSquares;
+        }
+        public string showSquares()
+        {
+            int[,] arranged = new int[n2,n2];
+            Square temp;
+            for (int i = 0; i < n4; i++)
+            {
+                temp = allSquares[i];
+                arranged[temp.getRow(),temp.getColumn()] = temp.getValue() + 1;
+            }
+            string display = "";
+            for (int row = 0; row < n2; row++)
+            {
+                for (int column = 0; column < n2; column++)
+                {
+                    display = display + " | " +arranged[row, column];
+                }
+                display = display + " |\n";
+            }
+            return display;
         }
     }
 }
