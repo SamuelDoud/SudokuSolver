@@ -124,6 +124,30 @@ namespace SudokuSolver
             }
             return -1;
         }
+        public int numberOfPossibilities()
+        {
+            int count = 0;
+            foreach (bool b in possibleValues)
+            {
+                if (b)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+        public int binaryCompare()
+        {
+            int representation = 0;
+            for (int i = 0; i < n2; i++)
+            {
+                if (possibleValues[i])
+                {
+                    representation += (int)Math.Pow(2, i);
+                }
+            }
+            return representation;
+        }
         public override string ToString()
         {
             return "(" + myRow + ", " + myColumn + ", " + myBlock + ")" + " is " + (myValue + 1);

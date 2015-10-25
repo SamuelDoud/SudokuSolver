@@ -48,6 +48,7 @@ namespace SudokuSolver
         {
             setImpossibles();
             elimination();
+            findNSum();
             
             return myMembers;
         }
@@ -74,6 +75,56 @@ namespace SudokuSolver
                 }
             }
         }
+        public void findNSum()
+        {
+            int targetN, binary, counter;
+            bool[] values;
+            List<int> impossibles;
+            int[] arrayOfPossibilitiesNum = new int[n2];
+            int[] arrayOfBinaryRepresentation = new int[n2];
+            for (int i = 0; i < n2; i++)
+            {
+                arrayOfBinaryRepresentation[i] = myMembers[i].binaryCompare();
+                arrayOfPossibilitiesNum[i] = myMembers[i].numberOfPossibilities();
+            }
+            for (int first = 0; first < n2; first++)
+            {
+                values = new bool[n2];
+                counter = 0;
+                targetN = arrayOfPossibilitiesNum[first];
+                if (targetN == 1)
+                {
+                    continue;
+                }
+                binary = arrayOfBinaryRepresentation[first];
+                for (int secondary = 0; secondary < n2; secondary++)
+                {
+                    if (binary == arrayOfBinaryRepresentation[secondary])
+                    {
+                        counter++;
+                        values[secondary] = true;
+                    }
+                }
+                if (counter == targetN && counter > 1)
+                {
+                    impossibles = new List<int>();
+                    for (int i = 0; i < n2; i++)
+                    {
+                        if ((myMembers[i].getPossibleValues())[i])
+                        {
+                            impossibles.Add(i);
+                        }
+                    }
+                    for (int i = 0; i < n2; i++)
+                    {
+                        if (!values[i])
+                        {
+                            myMembers[i].impossibleValues(impossibles);
+                        }
+                    }
+                }
+            }
+        }
         public bool[][] getPossibleValueTable()
         {
             int counter = 0;
@@ -84,6 +135,7 @@ namespace SudokuSolver
                 counter++;
             }
             return tempPossibleValues;
+            
         }
         public void setImpossibles()
         {//take out the values from the unit from the possible values of the others in the unit
