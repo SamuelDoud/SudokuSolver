@@ -8,38 +8,45 @@ namespace SudokuSolver
 {
     class Board
     {
-        public int[] typesAvailable = { UnitType.ROW, UnitType.COLUMN, UnitType.BLOCK };
-        Square[] allSquares;
-        private int n, n2 ,n4;
-        private int numberOfIterations = 0;
-        private bool complete;
+        /**
+            Class that represents the sudoku board.
+            Stores the squares and delgates them to unit types in alternating order
+            
+        */
+        public int[] typesAvailable = { UnitType.ROW, UnitType.COLUMN, UnitType.BLOCK };//the three organizational units of the board
+        Square[] allSquares;//the array of the squares on the board
+        private int n, n2 ,n4;//values of n (typical sudoku boards are n = 3). n2 is n * n (The number of organizational units of a type and the max value of a square). n4, n2 * n2, is the number of squares on a board.
+        private int numberOfIterations = 0; //how many alternations between types have been made
+        private bool complete;//is the board in a completely solved state?
         public Board(int n)
         {
             this.n = n;
             n2 = n * n;
             n4 = n2 * n2;
             allSquares = new Square[n4];
-            fillSquares();
+            fillSquares();//fill the squares with new squares
             complete = false;//has to be false in this case as the board is empty
         }
+        /**
+            Go to the next iteration if the board is not complete
+        */
         public void nextStep()
         {
-            complete = completionStatus();
+            complete = completionStatus();//figure out if the board is complete
             if (!complete)
             {
-                
                 UnitType current;
                 current = new UnitType(allSquares, n, typesAvailable[numberOfIterations % typesAvailable.Length]);//take the next unit type and set current to that
                 allSquares = current.operate();//set allSquares of the board equal to what it calculates
                 numberOfIterations++;
                 complete = completionStatus(); //update completion status
             }
-            else
+            else//the board is complete. Don't iterate anymore
             {
-                Console.WriteLine("Completed you dummy");
+                Console.WriteLine("Completed!");//
             }
         }
-        /*
+        /**
         Set all the squares in the array to unique positions
         */
         private bool completionStatus()
@@ -53,20 +60,27 @@ namespace SudokuSolver
             }
             return true;
         }
+        /**
+            The completion status of the board is returned
+        */
         public bool isComplete()
         {
             complete = completionStatus();
             return complete;
         }
+        /**
+            Populate the squares array with null values and relevant positions
+        */
         private void fillSquares()
         {
-            for (int position = 0; position < n4; position++)
+            for (int position = 0; position < n4; position++)//iterate through each element in the array
             {
-                allSquares[position] = new Square(position / n2, position % n2, n);
+                allSquares[position] = new Square(position / n2, position % n2, n);//create a new square with proper row and column values
             }
         }
         /*
-        A way to enter in initial values
+         A way to enter in initial value
+         TODO get a better, graphical way to do this
         */
         public void giveInitial(int row, int column, int value)
         {
@@ -82,18 +96,25 @@ namespace SudokuSolver
             }
             return allSquaresText;
         }
+        /**
+            Return the squares array. Going to be useful for when graphics are implemented
+        */
         public Square[] getSquares()
         {
             return allSquares;
         }
+        /**
+            A fancier ToString() method
+            This actually looks a little like a sudoku board
+        */
         public string showSquares()
         {
-            int[,] arranged = new int[n2,n2];
-            Square temp;
+            int[,] arranged = new int[n2,n2];//a visual way to imagine a sudoku board is a two dimmensional array
+            Square temp;//the current square being iterated to
             for (int i = 0; i < n4; i++)
             {
                 temp = allSquares[i];
-                arranged[temp.getRow(),temp.getColumn()] = temp.getValue() + 1;
+                arranged[temp.getRow(),temp.getColumn()] = temp.getValue() + 1;//get the temporary squares row and column and shove it into that array
             }
             string display = "";
             for (int row = 0; row < n2; row++)

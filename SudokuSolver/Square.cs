@@ -17,6 +17,7 @@ namespace SudokuSolver
         //block is an organizational unit like row and column. It is the 3x3 square of squares that are outlined in Sudoku puzzles
         public const int NULL_VALUE = -1;//the no value
         private bool[] possibleValues;//array of possible values for the square. Set to size n^2
+        bool updateUnhandled;
         public Square(int row, int column, int n)
         {
             myValue = NULL_VALUE;//default values
@@ -27,6 +28,7 @@ namespace SudokuSolver
             myBlock = column / n + n * (row / n);//The formula to determine a "block"
             possibleValues = new bool[n2];
             possibleValues = setAllInBoolArrayTo(possibleValues, true);
+            updateUnhandled = false;
         }
         /*
         Set all members of  a passed boolean array to a value true or false
@@ -55,8 +57,12 @@ namespace SudokuSolver
         {
             if (myValue == NULL_VALUE)//only need to run this operation if the square has no value
             {
-                possibleValues[value] = false;
-                onlyPossible();
+                if (possibleValues[value])//only run this if the value being set to not possible is currently possible
+                {
+                    possibleValues[value] = false;
+                    updateUnhandled = true;
+                    onlyPossible();
+                }
             }
         }
         /*
@@ -66,9 +72,14 @@ namespace SudokuSolver
         {
             if (myValue == NULL_VALUE)//only need to run this operation if the square has no value
             {
-                foreach (int i in values)//iterate through each integer
+                foreach (int value in values)//iterate through each integer
                 {
-                    possibleValues[i] = false;
+                    if (possibleValues[value])//only run this if the value being set to not possible is currently possible
+                    {
+                        possibleValues[value] = false;
+                        updateUnhandled = true;
+                        //the integer method is not called here because it checks for the onlyPossible on every call. A waste of resources.
+                    }
                 }
                 onlyPossible();//check to see if only one value is legal
             }
@@ -104,9 +115,13 @@ namespace SudokuSolver
         {
             if (value >= 0 && value < n * n)//check legality of value
             {
-                myValue = value;
-                possibleValues = setAllInBoolArrayTo(possibleValues, false); //all the others are no longer valid
-                possibleValues[myValue] = true; //set the value to true
+                if (myValue == NULL_VALUE)
+                {
+                    myValue = value;
+                    possibleValues = setAllInBoolArrayTo(possibleValues, false); //all the others are no longer valid
+                    possibleValues[myValue] = true; //set the value to true
+                    updateUnhandled = true;
+                }
             }
         }
         public int getValue()
@@ -185,6 +200,17 @@ namespace SudokuSolver
         public int position()
         {
             return myColumn + n2 * myRow;
+        }
+        public bool getUpdateStatus()
+        {
+            return updateUnhandled;
+        }
+        /**
+            Any update has been recognized and handled
+        */
+        public void updateHandled()
+        {
+            updateUnhandled = false;
         }
         //compare a squares position in an array
         //Useful for sorting

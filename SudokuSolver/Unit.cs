@@ -10,7 +10,7 @@ namespace SudokuSolver
     class Unit
     {
         Square[] myMembers;
-        bool isComplete, updateUnhandled;
+        bool isComplete;
         bool[][] valueTable;
         int n4, n2, n;
         public Unit(Square[] members)
@@ -21,8 +21,10 @@ namespace SudokuSolver
             n4 = n2 * n2;
             isComplete = checkCompletion();
             valueTable = new bool[n2][];
-            updateUnhandled = false;
         }
+        /**
+            Update the value table off possible valeus as it may be different
+        */
         private void updateValueTable()
         {
             for (int position = 0; position < n2; position++)
@@ -44,17 +46,48 @@ namespace SudokuSolver
             isComplete = tempCompletion;//using a temp so threading wont mess this up
             return isComplete;
         }
+        /**
+            The method to call the solving methods.
+            Will continue iteration until no more changes can be made
+        */
         public Square[] operate()
         {
-            setImpossibles();
-            elimination();
-            findNSum();
-            
+            do//always need to operate once
+            {
+
+                setImpossibles();
+                elimination();
+                findNSum();
+            } while (!updatesUnhandled());//there are no updates which haven't been recognized
             return myMembers;
         }
-        public void elimination()
+        /**
+            A square has been updated and the calculations should be rerun
+        */
+        private bool updatesUnhandled()
+        {
+            foreach (Square s in myMembers)
+            {
+                if (s.getUpdateStatus())// a square has been updated
+                    return true;//if one square has been updated it all the squares need to be reevaluated
+            }
+            return false;
+        }
+        /**
+            Any updates within a square have been recognized.
+        */
+        private void updatesHandled()
+        {
+            for (int position = 0; position < n2; position++)
+            {
+                myMembers[position].updateHandled();
+            }
+        }
+
+
+        private void elimination()
         {//there is only one value in the unit that can satisfy a value
-            int counter = 0, onlyIndex = -1 ;
+            int counter = 0, onlyIndex = -1;
             bool[][] possibleValueTable = getPossibleValueTable();
             for (int value = 0; value < n2; value++)
             {
@@ -70,8 +103,7 @@ namespace SudokuSolver
                 if (counter == 1)
                 {
                     myMembers[onlyIndex].setValue(value);
-                    possibleValueTable = getPossibleValueTable();// updates have been made. Reflect this.
-                    //value = 0;
+                    possibleValueTable = getPossibleValueTable();
                 }
             }
         }
@@ -119,55 +151,15 @@ namespace SudokuSolver
                     }
                 }
             }
+        }
+        /**
+            Hidden twins are if two values only appear twice and on the same square in a puzzle.
+            Therefore those two squares must contain those two values.
+            Remove anyother possible values from those squares.
+        */
+        private void FindHiddenTwins()
+        {
 
-
-            //int targetN, binary, counter;
-            //bool[] values;
-            //List<int> impossibles;
-            //int[] arrayOfPossibilitiesNum = new int[n2];
-            //int[] arrayOfBinaryRepresentation = new int[n2];
-            //for (int i = 0; i < n2; i++)
-            //{
-            //    arrayOfBinaryRepresentation[i] = myMembers[i].binaryCompare();
-            //    arrayOfPossibilitiesNum[i] = myMembers[i].numberOfPossibilities();
-            //}
-            //for (int first = 0; first < n2; first++)
-            //{
-            //    values = new bool[n2];
-            //    counter = 0;
-            //    targetN = arrayOfPossibilitiesNum[first];
-            //    if (targetN == 1)
-            //    {
-            //        continue;
-            //    }
-            //    binary = arrayOfBinaryRepresentation[first];
-            //    for (int secondary = 0; secondary < n2; secondary++)
-            //    {
-            //        if (binary == arrayOfBinaryRepresentation[secondary])
-            //        {
-            //            counter++;
-            //            values[secondary] = true;
-            //        }
-            //    }
-            //    if (counter == targetN && counter > 1)
-            //    {
-            //        impossibles = new List<int>();
-            //        for (int i = 0; i < n2; i++)
-            //        {
-            //            if ((myMembers[i].getPossibleValues())[i])
-            //            {
-            //                impossibles.Add(i);
-            //            }
-            //        }
-            //        for (int i = 0; i < n2; i++)
-            //        {
-            //            if (!values[i])
-            //            {
-            //                myMembers[i].impossibleValues(impossibles);
-            //            }
-            //        }
-            //    }
-            //}
         }
         private int[] getBinary()
         {
@@ -197,7 +189,7 @@ namespace SudokuSolver
                 counter++;
             }
             return tempPossibleValues;
-            
+
         }
         public void setImpossibles()
         {//take out the values from the unit from the possible values of the others in the unit
@@ -218,9 +210,10 @@ namespace SudokuSolver
                 {
                     myMembers[squareWithOutAValue].impossibleValues(impossibles);
                 }
-                    //updateUnhandled = true
             }
         }
-
+        /**
+            UnitType has handled the update
+        */
     }
 }
