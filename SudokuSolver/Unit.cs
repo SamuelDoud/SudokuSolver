@@ -54,10 +54,12 @@ namespace SudokuSolver
         {
             do//always need to operate once
             {
-                FindHiddenTwins(); //This is not working properly yet
+                
                 setImpossibles();
+                
                 elimination();
                 findNSum();
+                FindHiddenTwins(); //This is not working properly yet
             } while (!updatesUnhandled());//there are no updates which haven't been recognized
             return myMembers;
         }
@@ -195,10 +197,14 @@ namespace SudokuSolver
                                     values = new List<int>();//reset the value array
                                     for (int impossibleValue = 0; impossibleValue < n2; impossibleValue++)
                                     {
-                                        if (impossibleValue != value || impossibleValue != otherValue)//TODO generalize this!! The add all the values to the valeus array except the two hidden values
+                                        if (impossibleValue != value && impossibleValue != otherValue)//TODO generalize this!! The add all the values to the valeus array except the two hidden values
                                         {
                                             values.Add(impossibleValue);
-                                            Console.Write(impossibleValue + ", ");
+                                            
+                                        }
+                                        else
+                                        {
+                                            Console.Write((impossibleValue+1) + ", ");
                                         }
                                     }
                                     Console.Write("\t");
