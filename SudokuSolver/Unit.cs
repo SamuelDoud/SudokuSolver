@@ -77,53 +77,115 @@ namespace SudokuSolver
         }
         public void findNSum()
         {
-            int targetN, binary, counter;
+            int targetN, sum, counter;
             bool[] values;
             List<int> impossibles;
-            int[] arrayOfPossibilitiesNum = new int[n2];
-            int[] arrayOfBinaryRepresentation = new int[n2];
-            for (int i = 0; i < n2; i++)
-            {
-                arrayOfBinaryRepresentation[i] = myMembers[i].binaryCompare();
-                arrayOfPossibilitiesNum[i] = myMembers[i].numberOfPossibilities();
-            }
-            for (int first = 0; first < n2; first++)
-            {
-                values = new bool[n2];
+            int[] arrayOfPossibilitiesNum;
+            int[] arrayOfBinaryRepresentation;
+            arrayOfBinaryRepresentation = getBinary();
+            arrayOfPossibilitiesNum = getPossiblitiesNum();
+
+            for (int index = 0; index < n2; index++)
+            {//loop through all the squares in this unit
+                impossibles = new List<int>();//create a new list of impossible numbers
+                values = new bool[n2]; //clear this array which tracks similar combinations
+                targetN = arrayOfPossibilitiesNum[index];
+                sum = arrayOfBinaryRepresentation[index];
                 counter = 0;
-                targetN = arrayOfPossibilitiesNum[first];
-                if (targetN == 1)
+                for (int secondaryIndex = 0; secondaryIndex < n2; secondaryIndex++)
                 {
-                    continue;
-                }
-                binary = arrayOfBinaryRepresentation[first];
-                for (int secondary = 0; secondary < n2; secondary++)
-                {
-                    if (binary == arrayOfBinaryRepresentation[secondary])
+                    if (sum == arrayOfBinaryRepresentation[secondaryIndex])
                     {
                         counter++;
-                        values[secondary] = true;
+                        values[secondaryIndex] = true;
                     }
                 }
-                if (counter == targetN && counter > 1)
+                if (counter == targetN)
                 {
-                    impossibles = new List<int>();
-                    for (int i = 0; i < n2; i++)
-                    {
-                        if ((myMembers[i].getPossibleValues())[i])
+                    bool[] possibleArr = myMembers[index].getPossibleValues();
+                    for (int secondaryIndex = 0; secondaryIndex < n2; secondaryIndex++)
+                    {//this loop is the function that gives the impossible values of the index. The values that the other numbers cannot be now
+                        if (possibleArr[secondaryIndex])
                         {
-                            impossibles.Add(i);
+                            impossibles.Add(secondaryIndex);
                         }
                     }
-                    for (int i = 0; i < n2; i++)
+                    for (int secondaryIndex = 0; secondaryIndex < n2; secondaryIndex++)
                     {
-                        if (!values[i])
-                        {
-                            myMembers[i].impossibleValues(impossibles);
+                        if (!values[secondaryIndex])
+                        {//these are the values that are not identical
+                            myMembers[secondaryIndex].impossibleValues(impossibles);//pass the possible values as impossible to the other squares
                         }
                     }
                 }
             }
+
+
+            //int targetN, binary, counter;
+            //bool[] values;
+            //List<int> impossibles;
+            //int[] arrayOfPossibilitiesNum = new int[n2];
+            //int[] arrayOfBinaryRepresentation = new int[n2];
+            //for (int i = 0; i < n2; i++)
+            //{
+            //    arrayOfBinaryRepresentation[i] = myMembers[i].binaryCompare();
+            //    arrayOfPossibilitiesNum[i] = myMembers[i].numberOfPossibilities();
+            //}
+            //for (int first = 0; first < n2; first++)
+            //{
+            //    values = new bool[n2];
+            //    counter = 0;
+            //    targetN = arrayOfPossibilitiesNum[first];
+            //    if (targetN == 1)
+            //    {
+            //        continue;
+            //    }
+            //    binary = arrayOfBinaryRepresentation[first];
+            //    for (int secondary = 0; secondary < n2; secondary++)
+            //    {
+            //        if (binary == arrayOfBinaryRepresentation[secondary])
+            //        {
+            //            counter++;
+            //            values[secondary] = true;
+            //        }
+            //    }
+            //    if (counter == targetN && counter > 1)
+            //    {
+            //        impossibles = new List<int>();
+            //        for (int i = 0; i < n2; i++)
+            //        {
+            //            if ((myMembers[i].getPossibleValues())[i])
+            //            {
+            //                impossibles.Add(i);
+            //            }
+            //        }
+            //        for (int i = 0; i < n2; i++)
+            //        {
+            //            if (!values[i])
+            //            {
+            //                myMembers[i].impossibleValues(impossibles);
+            //            }
+            //        }
+            //    }
+            //}
+        }
+        private int[] getBinary()
+        {
+            int[] arrayOfBinaryRepresentation = new int[n2];
+            for (int index = 0; index < n2; index++)
+            {
+                arrayOfBinaryRepresentation[index] = myMembers[index].binaryCompare();
+            }
+            return arrayOfBinaryRepresentation;
+        }
+        private int[] getPossiblitiesNum()
+        {
+            int[] arrayOfPossibilitiesNum = new int[n2];
+            for (int index = 0; index < n2; index++)
+            {
+                arrayOfPossibilitiesNum[index] = myMembers[index].numberOfPossibilities();
+            }
+            return arrayOfPossibilitiesNum;
         }
         public bool[][] getPossibleValueTable()
         {
