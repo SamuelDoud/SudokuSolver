@@ -13,7 +13,7 @@ namespace SudokuSolver
             Stores the squares and delgates them to unit types in alternating order
             
         */
-        public int[] typesAvailable = { UnitType.ROW, UnitType.COLUMN, UnitType.BLOCK };//the three organizational units of the board
+        public int[] typesAvailable = { UnitType.COLUMN, UnitType.ROW, UnitType.BLOCK };//the three organizational units of the board
         Square[] allSquares;//the array of the squares on the board
         private int n, n2 ,n4;//values of n (typical sudoku boards are n = 3). n2 is n * n (The number of organizational units of a type and the max value of a square). n4, n2 * n2, is the number of squares on a board.
         private int numberOfIterations = 0; //how many alternations between types have been made

@@ -54,7 +54,7 @@ namespace SudokuSolver
         {
             do//always need to operate once
             {
-
+                FindHiddenTwins(); //This is not working properly yet
                 setImpossibles();
                 elimination();
                 findNSum();
@@ -83,8 +83,6 @@ namespace SudokuSolver
                 myMembers[position].updateHandled();
             }
         }
-
-
         private void elimination()
         {//there is only one value in the unit that can satisfy a value
             int counter = 0, onlyIndex = -1;
@@ -156,10 +154,88 @@ namespace SudokuSolver
             Hidden twins are if two values only appear twice and on the same square in a puzzle.
             Therefore those two squares must contain those two values.
             Remove anyother possible values from those squares.
+            TODO generalize this to n instead of twins
         */
         private void FindHiddenTwins()
         {
+            int[] countOfValueTable = countOfPossibleValues();
+            int[] positions;
+            int counter;
+            List<int> values;
+            //this array takes the number of squares that have a certain possible value
+            //useful for determining what values are worth searching
+            for (int value = 0; value < n2; value++)
+            {
+                
+                if (countOfValueTable[value] == 2)
+                {
+                    for(int otherValue = 0; otherValue < n2; otherValue++)
+                    {
+                        if (value != otherValue && countOfValueTable[otherValue] == 2)// the values are not the same and the other value has 2 spots
+                        {
+                            //Console.WriteLine("???");
+                            positions = new int[2];
+                            counter = 0;
+                            //now search for the psoitions of the two values. If they are the same, then we have a twin hidden pair.
+                            for (int position = 0; position < n2; position++)
+                            {
+                                
+                                if (valueTable[position][value] && valueTable[position][otherValue])
+                                {//this position has both values
+                                    positions[counter] = position;//this position is legal in the twin
+                                    counter++;
+                                }
+                                //Console.WriteLine(counter);
+                            }
+                            if (counter == 2)//this is a twin hidden! because two positions fufill this requiremnet
+                            {
+                                if (myMembers[positions[0]].numberOfPossibilities() != 2 || myMembers[positions[1]].numberOfPossibilities() != 2)
+                                {
+                                    Console.WriteLine("???");
+                                    values = new List<int>();//reset the value array
+                                    for (int impossibleValue = 0; impossibleValue < n2; impossibleValue++)
+                                    {
+                                        if (impossibleValue != value || impossibleValue != otherValue)//TODO generalize this!! The add all the values to the valeus array except the two hidden values
+                                        {
+                                            values.Add(impossibleValue);
+                                            Console.Write(impossibleValue + ", ");
+                                        }
+                                    }
+                                    Console.Write("\t");
+                                    foreach (int position in positions)//Go through each of the positions that met the requirement
+                                    {
+                                        myMembers[position].impossibleValues(values);
+                                        Console.Write(myMembers[position].getRow() + ", " + myMembers[position].getColumn() + "\t");
+                                    }
+                                    Console.WriteLine("Hidden Twin!");
+                                    //return;// having this operate more than once may be dangerous
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
+        }
+        /**
+            This array takes the number of squares that have a certain possible value
+        */
+        private int[] countOfPossibleValues()
+        {
+            updateValueTable();//we should make sure we are using a relevant value table!
+            int[] countOfValueTable = new int[n2];
+
+            for(int position = 0; position < n2; position++)//iterate through each square
+            {
+                for (int value = 0; value < n2; value++)//iterate through each possible value
+                {
+                    if(valueTable[position][value])//is the value at this position true?
+                    {
+                        countOfValueTable[value]++;//add one to the position in the array
+                    }
+                }
+            }
+            return countOfValueTable;
         }
         private int[] getBinary()
         {
