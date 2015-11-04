@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SudokuSolver
 {
@@ -14,6 +15,14 @@ namespace SudokuSolver
         private int n, n2 ,n4;//values of n (typical sudoku boards are n = 3). n2 is n * n (The number of organizational units of a type and the max value of a square). n4, n2 * n2, is the number of squares on a board.
         private int numberOfIterations = 0; //how many alternations between types have been made
         private bool complete;//is the board in a completely solved state?
+        public Board(int n, Square[] squares)
+        {
+            this.n = n;
+            n2 = n * n;
+            n4 = n2 * n2;
+            allSquares = squares;
+            complete = false;//has to be false in this case as the board is empty
+        }
         public Board(int n)
         {
             this.n = n;
@@ -57,6 +66,10 @@ namespace SudokuSolver
                 else
                 {
                     count = 0;
+                }
+                if (count == 10)
+                {
+                    Guess();
                 }
             }
         }
@@ -151,6 +164,69 @@ namespace SudokuSolver
                     giveInitial(i / n2, i % n2, int.Parse(initialState[i].ToString()));
                 }
             }
+        }
+   
+        private void Guess()
+        {
+            //find a square with two possible values
+            Square temp;
+            Board branch;
+            List<int> nums = new List<int>();
+            for (int i = 0; i < n4; i++)
+            {
+                if (allSquares[i].numberOfPossibilities() == 2)
+                {
+                    temp = allSquares[i];
+                    nums = temp.GetPossibleValuesList();
+                    foreach(int possible in nums)
+                    {
+                        branch = new Board(n, allSquares);
+                        branch.completePuzzle();
+                        if (branch.isLegal() && branch.isComplete())
+                        {
+                            i = n4;
+                            break;
+                        }
+                        else
+                        {
+                            allSquares[i] = temp;
+                        }
+                    }
+                }
+            }
+        }
+        public bool isLegal()
+        {
+            int[][] values = new int[n2 * 3][];//there are n2 * 3 units on the board
+            for (int arrIndex = 0; arrIndex < values.Length; arrIndex++)
+            {
+                values[arrIndex] = new int[n2];
+            }
+            int value;
+            Square s;
+                for (int squareIndex = 0; squareIndex < n4; squareIndex++)
+                {
+                    s = allSquares[squareIndex];
+                    value = s.getValue();
+                    if (value != Square.NULL_VALUE)
+                    {
+                        values[s.getColumn() * UnitType.COLUMN][value]++;
+                        values[s.getRow() * UnitType.ROW][value]++;
+                        values[s.getBlock() * UnitType.BLOCK][value]++;
+                    }
+                }
+            foreach (int[] arr in values)
+            {
+                foreach (int count in arr)
+                {
+                    if (count > 1)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+            //go through rows
         }
     }
 }
