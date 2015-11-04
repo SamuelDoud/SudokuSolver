@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SudokuSolver
 {
     //a unit is a collection of n * n squares which must be unique. Think of it as a column, row, or block
     class Unit
     {
-        Square[] myMembers;
-        bool isComplete;
-        bool[][] valueTable;
-        int n4, n2, n;
+        private Square[] myMembers;
+        private bool isComplete;
+        private bool[][] valueTable;
+        private int n4, n2, n, maxSum;
         public Unit(Square[] members)
         {
             myMembers = members;
             n2 = myMembers.Length;
             n = (int)Math.Sqrt(n2);
             n4 = n2 * n2;
+            maxSum = (int)Math.Pow(2, n2 - 1);
             isComplete = checkCompletion();
             valueTable = new bool[n2][];
         }
@@ -54,13 +52,12 @@ namespace SudokuSolver
         {
             do//always need to operate once
             {
-                
+                updatesHandled();
                 setImpossibles();
-                
                 elimination();
                 findNSum();
                 FindHiddenTwins(); //This is not working properly yet
-            } while (!updatesUnhandled());//there are no updates which haven't been recognized
+            } while (updatesUnhandled());//there are no updates which haven't been recognized
             return myMembers;
         }
         /**
@@ -107,32 +104,39 @@ namespace SudokuSolver
                 }
             }
         }
+
+        /**
+        This method is looking for what would be called "twins" or triples... etc.
+        If two squares in a unit have possible values of 2 and 5 and only those values.
+        No other square in that unit can have 2 and 5 as possible values.
+        */
         public void findNSum()
         {
+            //Declarations
             int targetN, sum, counter;
-            bool[] values;
+            bool[] values;//Used to save values that are found to be NSums
             List<int> impossibles;
             int[] arrayOfPossibilitiesNum;
             int[] arrayOfBinaryRepresentation;
-            arrayOfBinaryRepresentation = getBinary();
-            arrayOfPossibilitiesNum = getPossiblitiesNum();
-
+            //The next two method calls are operating on all squares
+            arrayOfBinaryRepresentation = getBinary();//returns a number between 0-2^(n2). Unique for every possible square combo
+            arrayOfPossibilitiesNum = getPossiblitiesNum();//get the number of possible values on a square
             for (int index = 0; index < n2; index++)
             {//loop through all the squares in this unit
                 impossibles = new List<int>();//create a new list of impossible numbers
                 values = new bool[n2]; //clear this array which tracks similar combinations
-                targetN = arrayOfPossibilitiesNum[index];
-                sum = arrayOfBinaryRepresentation[index];
-                counter = 0;
+                targetN = arrayOfPossibilitiesNum[index];//targetN takes the number of possiblilities on a square.
+                sum = arrayOfBinaryRepresentation[index];//sum is the binary sum of the square
+                counter = 0;//counter tracks the number of like squares. If counter is equal to targetN at the end, then a Nsum is found 
                 for (int secondaryIndex = 0; secondaryIndex < n2; secondaryIndex++)
                 {
-                    if (sum == arrayOfBinaryRepresentation[secondaryIndex])
+                    if (sum == arrayOfBinaryRepresentation[secondaryIndex])//the squares have similar characteristics!
                     {
-                        counter++;
+                        counter++;//increment the counter
                         values[secondaryIndex] = true;
                     }
                 }
-                if (counter == targetN)
+                if (counter == targetN)//We have found a NSum
                 {
                     bool[] possibleArr = myMembers[index].getPossibleValues();
                     for (int secondaryIndex = 0; secondaryIndex < n2; secondaryIndex++)
@@ -142,13 +146,15 @@ namespace SudokuSolver
                             impossibles.Add(secondaryIndex);
                         }
                     }
+                    impossibles = myMembers[index].GetPossibleValuesList();//get the impossible values from the original square
                     for (int secondaryIndex = 0; secondaryIndex < n2; secondaryIndex++)
                     {
-                        if (!values[secondaryIndex])
+                        if (!values[secondaryIndex])//the value is not in the Nsum, give it the possible values of the NSums
                         {//these are the values that are not identical
                             myMembers[secondaryIndex].impossibleValues(impossibles);//pass the possible values as impossible to the other squares
                         }
                     }
+                    arrayOfBinaryRepresentation = getBinary();//since the squares have changed we need to redo this!
                 }
             }
         }
@@ -168,10 +174,10 @@ namespace SudokuSolver
             //useful for determining what values are worth searching
             for (int value = 0; value < n2; value++)
             {
-                
+
                 if (countOfValueTable[value] == 2)
                 {
-                    for(int otherValue = 0; otherValue < n2; otherValue++)
+                    for (int otherValue = 0; otherValue < n2; otherValue++)
                     {
                         if (value != otherValue && countOfValueTable[otherValue] == 2)// the values are not the same and the other value has 2 spots
                         {
@@ -181,7 +187,7 @@ namespace SudokuSolver
                             //now search for the psoitions of the two values. If they are the same, then we have a twin hidden pair.
                             for (int position = 0; position < n2; position++)
                             {
-                                
+
                                 if (valueTable[position][value] && valueTable[position][otherValue])
                                 {//this position has both values
                                     positions[counter] = position;//this position is legal in the twin
@@ -193,28 +199,25 @@ namespace SudokuSolver
                             {
                                 if (myMembers[positions[0]].numberOfPossibilities() != 2 || myMembers[positions[1]].numberOfPossibilities() != 2)
                                 {
-                                    Console.WriteLine("???");
                                     values = new List<int>();//reset the value array
                                     for (int impossibleValue = 0; impossibleValue < n2; impossibleValue++)
                                     {
                                         if (impossibleValue != value && impossibleValue != otherValue)//TODO generalize this!! The add all the values to the valeus array except the two hidden values
                                         {
                                             values.Add(impossibleValue);
-                                            
                                         }
                                         else
                                         {
-                                            Console.Write((impossibleValue+1) + ", ");
+                                            //Console.Write((impossibleValue + 1) + ", ");
                                         }
                                     }
-                                    Console.Write("\t");
+                                    //Console.Write("\t");
                                     foreach (int position in positions)//Go through each of the positions that met the requirement
                                     {
                                         myMembers[position].impossibleValues(values);
-                                        Console.Write(myMembers[position].getRow() + ", " + myMembers[position].getColumn() + "\t");
+                                        //Console.Write(myMembers[position].getRow() + ", " + myMembers[position].getColumn() + "\t");
                                     }
-                                    Console.WriteLine("Hidden Twin!");
-                                    //return;// having this operate more than once may be dangerous
+                                   // Console.WriteLine("Hidden Twin!");
                                 }
                             }
                         }
@@ -231,11 +234,11 @@ namespace SudokuSolver
             updateValueTable();//we should make sure we are using a relevant value table!
             int[] countOfValueTable = new int[n2];
 
-            for(int position = 0; position < n2; position++)//iterate through each square
+            for (int position = 0; position < n2; position++)//iterate through each square
             {
                 for (int value = 0; value < n2; value++)//iterate through each possible value
                 {
-                    if(valueTable[position][value])//is the value at this position true?
+                    if (valueTable[position][value])//is the value at this position true?
                     {
                         countOfValueTable[value]++;//add one to the position in the array
                     }
@@ -295,7 +298,22 @@ namespace SudokuSolver
             }
         }
         /**
-            UnitType has handled the update
+            Tryign to simplify the NSum method by adding a method which gets
+            the numbers not in a square by using its binary sum
         */
+        public List<int> findNumsNotInBinary(int binarySum)
+        {
+            List<int> values = new List<int>();
+            binarySum = maxSum - binarySum;
+            for (int i = (int)Math.Pow(2, n2 - 1); i >= 1 && binarySum > 0; i /= 2)
+            {
+                if (binarySum >= i)
+                {
+                    binarySum -= i;//decrement binary sum
+                    values.Add((int)Math.Log(i, 2));//return the logarithim of the indexing varible with base 2
+                }
+            }
+            return values;
+        }
     }
 }

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SudokuSolver
 {
@@ -11,7 +8,7 @@ namespace SudokuSolver
     //Possible Values are stored as bools in an array
     //A value can be determined to not be possible by passing that particular value as an integer by itself or in a list
     //If there is only one value possible, set that value equal to that value
-    class Square : IComparable
+    public class Square : IComparable
     {
         private int myValue, myRow, myColumn, n, n2, myBlock;//n is the complexity of the given puzzle. 
         //block is an organizational unit like row and column. It is the 3x3 square of squares that are outlined in Sudoku puzzles
@@ -43,11 +40,23 @@ namespace SudokuSolver
             return array; // return the array
         }
         /*
-        Returns all of the legal values
+        Returns all of the legal values as a list of integers or a boolean array
         */
         public bool[] getPossibleValues()
         {
             return possibleValues;
+        }
+        public List<int> GetPossibleValuesList()
+        {
+            List<int> possibles = new List<int>();
+            for (int i = 0; i < n2; i++)
+            {
+                if (possibleValues[i])
+                {
+                    possibles.Add(i);
+                }
+            }
+            return possibles;
         }
         /*
             Set one value to impossible in the array of possible values
@@ -176,14 +185,14 @@ namespace SudokuSolver
         }
         /*
             An array of bools can be thought of as a binary number. Each permutation of the array maps to a binary number
-            with a decimal limit of 2^(n^2). This value can be used to quickly compare squares
+            with a decimal limit of 2^(n^2-1). This value can be used to quickly compare squares
         */
         public int binaryCompare()
         {
             int representation = 0;
             for (int i = 0; i < n2; i++)
             {
-                if (possibleValues[i])
+                if (possibleValues[i])//if i is a possible value
                 {
                     representation += (int)Math.Pow(2, i);
                 }

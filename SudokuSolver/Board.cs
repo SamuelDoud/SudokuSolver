@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SudokuSolver
 {
-    class Board
+    public class Board
     {
         /**
             Class that represents the sudoku board.
@@ -44,6 +40,24 @@ namespace SudokuSolver
             else//the board is complete. Don't iterate anymore
             {
                 Console.WriteLine("Completed!");//
+            }
+        }
+        public void completePuzzle()
+        {//need a way to detect if the puzzle is looping without change
+            Square[] tempSquares;
+            int count = 0;
+            while(!completionStatus() && count < 10)
+            {
+                tempSquares = allSquares;
+                nextStep();
+                if (allSquares.Equals(tempSquares))
+                {
+                    count++;
+                }
+                else
+                {
+                    count = 0;
+                }
             }
         }
         /**
@@ -101,6 +115,7 @@ namespace SudokuSolver
         */
         public Square[] getSquares()
         {
+            Array.Sort<Square>(allSquares);
             return allSquares;
         }
         /**
@@ -121,11 +136,21 @@ namespace SudokuSolver
             {
                 for (int column = 0; column < n2; column++)
                 {
-                    display = display + " | " +arranged[row, column];
+                    display = display + " | " + arranged[row, column];
                 }
                 display = display + " |\n";
             }
             return display;
+        }
+        public void setupBoardFromString(string initialState)
+        {
+            for (int i = 0; i < initialState.Length; i++)
+            {
+                if (!initialState[i].Equals('0'))
+                {
+                    giveInitial(i / n2, i % n2, int.Parse(initialState[i].ToString()));
+                }
+            }
         }
     }
 }

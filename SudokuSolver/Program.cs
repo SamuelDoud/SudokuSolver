@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SudokuSolver
 {
@@ -11,8 +7,62 @@ namespace SudokuSolver
         static void Main(string[] args)
         {
             string repeat = "";
+            //XWing Test
             Board b = new Board(3);
-            //HIDDEN PRIME TEST
+            //b.giveInitial(0, 0, 9);
+            //b.giveInitial(0, 3, 8);
+            //b.giveInitial(0, 4, 6);
+            //b.giveInitial(0, 5, 1);
+            //b.giveInitial(0, 8, 5);
+
+            //b.giveInitial(1, 1, 8);
+            //b.giveInitial(1, 2, 7);
+            //b.giveInitial(1, 3, 5);
+            //b.giveInitial(1, 4, 4);
+            //b.giveInitial(1, 5, 2);
+            //b.giveInitial(1, 8, 9);
+
+            //b.giveInitial(2, 3, 9);
+            //b.giveInitial(2, 4, 7);
+            //b.giveInitial(2, 5, 3);
+            //b.giveInitial(2, 8, 2);
+
+            //b.giveInitial(3, 0, 8);
+            //b.giveInitial(3, 5, 4);
+            //b.giveInitial(3, 6, 1);
+            //b.giveInitial(3, 8, 3);
+
+            //b.giveInitial(4, 1, 6);
+            //b.giveInitial(4, 2, 1);
+            //b.giveInitial(4, 4, 3);
+            //b.giveInitial(4, 5, 5);
+            //b.giveInitial(4, 6, 9);
+            //b.giveInitial(4, 7, 4);
+            //b.giveInitial(4, 8, 8);
+
+            //b.giveInitial(5, 0, 4);
+            //b.giveInitial(5, 2, 3);
+            //b.giveInitial(5, 3, 1);
+            //b.giveInitial(5, 4, 8);
+            //b.giveInitial(5, 8, 7);
+
+            //b.giveInitial(6, 0, 5);
+            //b.giveInitial(6, 1, 1);
+            //b.giveInitial(6, 5, 7);
+            //b.giveInitial(6, 8, 6);
+
+            //b.giveInitial(7, 4, 5);
+            //b.giveInitial(7, 5, 8);
+            //b.giveInitial(7, 6, 2);
+            //b.giveInitial(7, 7, 9);
+            //b.giveInitial(7, 8, 1);
+
+            //b.giveInitial(8, 2, 8);
+            //b.giveInitial(8, 3, 3);
+            //b.giveInitial(8, 4, 1);
+            //b.giveInitial(8, 8, 4);
+
+            //HIDDEN TWIN TEST
             //b.giveInitial(0, 3, 5);
             //b.giveInitial(0, 5, 3);
             //b.giveInitial(0, 7, 9);
@@ -65,50 +115,50 @@ namespace SudokuSolver
             //b.giveInitial(8, 4, 9);
             //b.giveInitial(8, 5, 8);
 
-            b.giveInitial(0, 0, 9);
-            b.giveInitial(0, 1, 8);
-            b.giveInitial(0, 3, 4);
-            b.giveInitial(0, 4, 7);
-            b.giveInitial(0, 5, 2);
+            //b.giveInitial(0, 0, 9);
+            //b.giveInitial(0, 1, 8);
+            //b.giveInitial(0, 3, 4);
+            //b.giveInitial(0, 4, 7);
+            //b.giveInitial(0, 5, 2);
 
-            b.giveInitial(1, 2, 7);
-            b.giveInitial(1, 6, 2);
-            b.giveInitial(1, 8, 8);
+            //b.giveInitial(1, 2, 7);
+            //b.giveInitial(1, 6, 2);
+            //b.giveInitial(1, 8, 8);
 
-            b.giveInitial(2, 0, 2);
-            b.giveInitial(2, 1, 6);
-            b.giveInitial(2, 4, 8);
-            b.giveInitial(2, 7, 9);
-            b.giveInitial(2, 8, 7);
+            //b.giveInitial(2, 0, 2);
+            //b.giveInitial(2, 1, 6);
+            //b.giveInitial(2, 4, 8);
+            //b.giveInitial(2, 7, 9);
+            //b.giveInitial(2, 8, 7);
 
-            b.giveInitial(3, 0, 4);
-            b.giveInitial(3, 4, 3);
-            b.giveInitial(3, 7, 7);
-            b.giveInitial(3, 8, 5);
+            //b.giveInitial(3, 0, 4);
+            //b.giveInitial(3, 4, 3);
+            //b.giveInitial(3, 7, 7);
+            //b.giveInitial(3, 8, 5);
 
-            b.giveInitial(4, 2, 6);
-            b.giveInitial(4, 3, 7);
-            b.giveInitial(4, 5, 4);
-            b.giveInitial(4, 6, 8);
-            b.giveInitial(4, 7, 2);
+            //b.giveInitial(4, 2, 6);
+            //b.giveInitial(4, 3, 7);
+            //b.giveInitial(4, 5, 4);
+            //b.giveInitial(4, 6, 8);
+            //b.giveInitial(4, 7, 2);
 
-            b.giveInitial(5, 0, 7);
-            b.giveInitial(5, 4, 2);
-            b.giveInitial(5, 8, 1);
+            //b.giveInitial(5, 0, 7);
+            //b.giveInitial(5, 4, 2);
+            //b.giveInitial(5, 8, 1);
 
-            b.giveInitial(6, 0, 8);
-            b.giveInitial(6, 1, 7);
-            b.giveInitial(6, 4, 4);
-            b.giveInitial(6, 7, 3);
+            //b.giveInitial(6, 0, 8);
+            //b.giveInitial(6, 1, 7);
+            //b.giveInitial(6, 4, 4);
+            //b.giveInitial(6, 7, 3);
 
-            b.giveInitial(7, 0, 5);
-            b.giveInitial(7, 2, 9);
-            b.giveInitial(7, 6, 7);
+            //b.giveInitial(7, 0, 5);
+            //b.giveInitial(7, 2, 9);
+            //b.giveInitial(7, 6, 7);
 
-            b.giveInitial(8, 0, 6);
-            b.giveInitial(8, 3, 9);
-            b.giveInitial(8, 5, 7);
-            b.giveInitial(8, 7, 8);
+            //b.giveInitial(8, 0, 6);
+            //b.giveInitial(8, 3, 9);
+            //b.giveInitial(8, 5, 7);
+            //b.giveInitial(8, 7, 8);
 
 
             //int value;
@@ -126,42 +176,42 @@ namespace SudokuSolver
             //}
 
             //VERY HARD PUZZLE
-            //b.giveInitial(0, 0, 8);
+            b.giveInitial(0, 0, 8);
 
-            //b.giveInitial(1, 2, 3);
-            //b.giveInitial(1, 3, 6);
+            b.giveInitial(1, 2, 3);
+            b.giveInitial(1, 3, 6);
 
-            //b.giveInitial(2, 1, 7);
-            //b.giveInitial(2, 4, 9);
-            //b.giveInitial(2, 6, 2);
+            b.giveInitial(2, 1, 7);
+            b.giveInitial(2, 4, 9);
+            b.giveInitial(2, 6, 2);
 
-            //b.giveInitial(3, 1, 5);
-            //b.giveInitial(3, 5, 7);
+            b.giveInitial(3, 1, 5);
+            b.giveInitial(3, 5, 7);
 
-            //b.giveInitial(4, 4, 4);
-            //b.giveInitial(4, 5, 5);
-            //b.giveInitial(4, 6, 7);
+            b.giveInitial(4, 4, 4);
+            b.giveInitial(4, 5, 5);
+            b.giveInitial(4, 6, 7);
 
-            //b.giveInitial(5, 3, 1);
-            //b.giveInitial(5, 7, 3);
+            b.giveInitial(5, 3, 1);
+            b.giveInitial(5, 7, 3);
 
-            //b.giveInitial(6, 2, 1);
-            //b.giveInitial(6, 7, 6);
-            //b.giveInitial(6, 8, 8);
+            b.giveInitial(6, 2, 1);
+            b.giveInitial(6, 7, 6);
+            b.giveInitial(6, 8, 8);
 
-            //b.giveInitial(7, 2, 8);
-            //b.giveInitial(7, 3, 5);
-            //b.giveInitial(7, 7, 1);
+            b.giveInitial(7, 2, 8);
+            b.giveInitial(7, 3, 5);
+            b.giveInitial(7, 7, 1);
 
-            //b.giveInitial(8, 1, 9);
-            //b.giveInitial(8, 6, 4);
+            b.giveInitial(8, 1, 9);
+            b.giveInitial(8, 6, 4);
 
-            ////CHEAT VALUES
-            ////b.giveInitial(8, 8, 2);
-            //b.giveInitial(0, 7, 4);
-            //b.giveInitial(0, 2, 2);
-            //b.giveInitial(4, 2, 9);
-            //b.giveInitial(5, 0, 2);
+            //CHEAT VALUES
+            b.giveInitial(8, 8, 2);
+            b.giveInitial(0, 7, 4);
+            b.giveInitial(0, 2, 2);
+            b.giveInitial(4, 2, 9);
+            b.giveInitial(5, 0, 2);
 
             //Board b = new Board(2);
 
