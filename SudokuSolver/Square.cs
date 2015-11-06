@@ -174,6 +174,10 @@ namespace SudokuSolver
         public int numberOfPossibilities()
         {
             int count = 0;
+            if (myValue != NULL_VALUE)
+            {
+                return 1;
+            }
             foreach (bool b in possibleValues)//iterate through each
             {
                 if (b)

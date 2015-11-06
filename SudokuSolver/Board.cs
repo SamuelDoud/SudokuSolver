@@ -8,14 +8,30 @@ namespace SudokuSolver
         /**
             Class that represents the sudoku board.
             Stores the squares and delgates them to unit types in alternating order
-            
         */
+        public const int GUESS_MARK = 10;//the number of moves without a change it takes to start guessing
+        private int count;//stores the number of moves since a change
         public int[] typesAvailable = { UnitType.COLUMN, UnitType.ROW, UnitType.BLOCK };//the three organizational units of the board
         Square[] allSquares;//the array of the squares on the board
         private int n, n2 ,n4;//values of n (typical sudoku boards are n = 3). n2 is n * n (The number of organizational units of a type and the max value of a square). n4, n2 * n2, is the number of squares on a board.
         private int numberOfIterations = 0; //how many alternations between types have been made
         private bool complete;//is the board in a completely solved state?
+        //Constructors
         public Board(int n, Square[] squares)
+        {
+            initalize(n, squares);
+        }
+        public Board(int n)
+        {
+            this.n = n;
+            n2 = n * n;
+            n4 = n2 * n2;
+            complete = false;//has to be false in this case as the board is empty
+            allSquares = new Square[n4];
+            fillSquares();//fill the squares with new squares
+            
+        }
+        private void initalize(int n, Square[] squares)
         {
             this.n = n;
             n2 = n * n;
@@ -23,55 +39,42 @@ namespace SudokuSolver
             allSquares = squares;
             complete = false;//has to be false in this case as the board is empty
         }
-        public Board(int n)
-        {
-            this.n = n;
-            n2 = n * n;
-            n4 = n2 * n2;
-            allSquares = new Square[n4];
-            fillSquares();//fill the squares with new squares
-            complete = false;//has to be false in this case as the board is empty
-        }
         /**
             Go to the next iteration if the board is not complete
         */
-        public void nextStep()
+        public bool nextStep()
         {
+            Square[] comparatorSquares = new Square[allSquares.Length];
+            Array.Copy(allSquares, comparatorSquares, allSquares.Length);
             complete = completionStatus();//figure out if the board is complete
-            if (!complete)
+            if (!complete && isLegal() && count < GUESS_MARK + 1)
             {
                 UnitType current;
                 current = new UnitType(allSquares, n, typesAvailable[numberOfIterations % typesAvailable.Length]);//take the next unit type and set current to that
                 allSquares = current.operate();//set allSquares of the board equal to what it calculates
                 numberOfIterations++;
                 complete = completionStatus(); //update completion status
+                if (!current.HaveChangesBeenMade())
+                {
+                    count++;
+                    Console.WriteLine(count);
+                }
+                if (count >= GUESS_MARK)
+                {
+                    //Guess();
+                    //count = 0;
+                }
+                return false;//not complete
             }
             else//the board is complete. Don't iterate anymore
             {
-                Console.WriteLine("Completed!");//
+                return true;//complete
             }
+
         }
         public void completePuzzle()
         {//need a way to detect if the puzzle is looping without change
-            Square[] tempSquares;
-            int count = 0;
-            while(!completionStatus() && count < 10)
-            {
-                tempSquares = allSquares;
-                nextStep();
-                if (allSquares.Equals(tempSquares))
-                {
-                    count++;
-                }
-                else
-                {
-                    count = 0;
-                }
-                if (count == 10)
-                {
-                    Guess();
-                }
-            }
+            while (!nextStep()) ;
         }
         /**
         Set all the squares in the array to unique positions
@@ -169,30 +172,35 @@ namespace SudokuSolver
         private void Guess()
         {
             //find a square with two possible values
-            Square temp;
+            Console.WriteLine("Guessing!");
+            Square[] temp;
             Board branch;
-            List<int> nums = new List<int>();
+            List<Square[]> permutations = new List<Square[]>();
             for (int i = 0; i < n4; i++)
             {
-                if (allSquares[i].numberOfPossibilities() == 2)
+                if (allSquares[i].getValue() != Square.NULL_VALUE)
                 {
-                    temp = allSquares[i];
-                    nums = temp.GetPossibleValuesList();
-                    foreach(int possible in nums)
+
+                    foreach (int values in allSquares[i].GetPossibleValuesList())
                     {
-                        branch = new Board(n, allSquares);
-                        branch.completePuzzle();
-                        if (branch.isLegal() && branch.isComplete())
-                        {
-                            i = n4;
-                            break;
-                        }
-                        else
-                        {
-                            allSquares[i] = temp;
-                        }
+                        temp = new Square[n4];
+                        Array.Copy(allSquares, temp, n4);
+                        temp[i].setValue(i);
+                        permutations.Add(temp);
                     }
                 }
+            }
+            foreach (Square[] sArr in permutations)
+            {
+                branch = new Board(n, sArr);
+                branch.completePuzzle();
+                if (branch.isLegal() && branch.isComplete())
+                {
+                    allSquares = branch.allSquares;
+                    Console.WriteLine(showSquares() + "\n\n!!!!!!!");
+                    Console.ReadLine();
+                }
+
             }
         }
         public bool isLegal()
@@ -210,9 +218,9 @@ namespace SudokuSolver
                     value = s.getValue();
                     if (value != Square.NULL_VALUE)
                     {
-                        values[s.getColumn() * UnitType.COLUMN][value]++;
-                        values[s.getRow() * UnitType.ROW][value]++;
-                        values[s.getBlock() * UnitType.BLOCK][value]++;
+                        values[s.getColumn() + UnitType.COLUMN * n2][value]++;
+                        values[s.getRow() + UnitType.ROW * n2][value]++;
+                        values[s.getBlock() + UnitType.BLOCK * n2][value]++;
                     }
                 }
             foreach (int[] arr in values)

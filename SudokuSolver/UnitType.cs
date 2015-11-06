@@ -8,6 +8,7 @@ namespace SudokuSolver
     class UnitType
     {
         public bool isComplete;
+        private bool changesMade;
         public const int ROW = 0;
         public const int COLUMN = ROW + 1;
         public const int BLOCK = COLUMN + 1;
@@ -16,6 +17,7 @@ namespace SudokuSolver
         private int n, n2, n4, myType;
         public UnitType(Square[] squares, int n, int type)
         {
+            changesMade = false;
             this.n = n;
             n2 = n * n;
             n4 = n2 * n2;
@@ -76,7 +78,23 @@ namespace SudokuSolver
             //check completion status
             XWing();
             checkCompletion();//I need to make sure this is properly ordered
+            changesMade = ChangesMade(unitsOfAType);
             return allSquares;
+        }
+        public bool HaveChangesBeenMade()
+        {
+            return changesMade;
+        }
+        private bool ChangesMade(Unit[] units)
+        {
+            foreach (Unit u in units)
+            {
+                if (u.changeStatus())
+                {
+                    return true;
+                }
+            }
+            return false;
         }
         /**
             An advanced strategy looking for numbers in a square area

@@ -6,12 +6,14 @@ namespace SudokuSolver
     //a unit is a collection of n * n squares which must be unique. Think of it as a column, row, or block
     class Unit
     {
+        private bool unitHasBeenChanged;
         private Square[] myMembers;
         private bool isComplete;
         private bool[][] valueTable;
         private int n4, n2, n, maxSum;
         public Unit(Square[] members)
         {
+            unitHasBeenChanged = false;
             myMembers = members;
             n2 = myMembers.Length;
             n = (int)Math.Sqrt(n2);
@@ -60,6 +62,10 @@ namespace SudokuSolver
             } while (updatesUnhandled());//there are no updates which haven't been recognized
             return myMembers;
         }
+        public bool changeStatus()
+        {
+            return unitHasBeenChanged;
+        }
         /**
             A square has been updated and the calculations should be rerun
         */
@@ -68,7 +74,10 @@ namespace SudokuSolver
             foreach (Square s in myMembers)
             {
                 if (s.getUpdateStatus())// a square has been updated
+                {
+                    unitHasBeenChanged = true;
                     return true;//if one square has been updated it all the squares need to be reevaluated
+                }
             }
             return false;
         }
